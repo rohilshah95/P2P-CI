@@ -48,64 +48,53 @@ class open_connection(threading.Thread):
 
     def create_message(self, type, rfc_number):
         version = 'P2P-CI/1.0'
-        sp = ' '
+        space = ' '
         crlf = '\n'
-        host = 'Host:' + sp + socket.gethostbyname(socket.gethostname())
-        port = 'Port:' + sp + str(self.upload_port)    
+        host = 'Host:' + space + socket.gethostbyname(socket.gethostname())
+        port = 'Port:' + space + str(self.upload_port)    
         method = type
         message = ''
         if type == 'ADD' or type == 'LOOKUP':            
-            RFC = 'RFC'+ sp +str(input("RFC Number = "))
-            title = 'Title:' + sp + str(input("RFC title = "))    
-            message = method + sp + RFC + sp + version + crlf + host + crlf + port + crlf + title + crlf + crlf            
-        # elif type == 'LOOKUP':            
-        #     RFC = 'RFC'+ sp +str(input("RFC Number = "))
-        #     title = 'Title:' + sp + str(input("RFC title = "))    
-        #     message = method + sp + RFC + sp + version + crlf + host + crlf + port + crlf + title + crlf + crlf
+            RFC = 'RFC'+ space +str(input("RFC Number = "))
+            title = 'Title:' + space + str(input("RFC title = "))    
+            message = method + space + RFC + space + version + crlf + host + crlf + port + crlf + title + crlf + crlf            
         elif type == 'GET':
-            RFC = 'RFC' + sp + rfc_number
-            OS = 'OS:'+ sp + platform.platform()
-            message = method + sp + RFC + sp + version + crlf + host + crlf + OS + crlf + crlf                                
+            RFC = 'RFC' + space + rfc_number
+            OS = 'OS:'+ space + platform.platform()
+            message = method + space + RFC + space + version + crlf + host + crlf + OS + crlf + crlf                                
         else:
-            message = method+sp+version+crlf+host+crlf+port+crlf+crlf        
+            message = method + space + version + crlf + host + crlf + port + crlf + crlf        
         return message                
     
     def add_RFC(self, client_socket):
-        sendMessage = self.create_message('ADD',0)
-        client_socket.send(bytes(sendMessage,'UTF-8'))    
+        message_to_send = self.create_message('ADD',0)
+        client_socket.send(bytes(message_to_send,'UTF-8'))    
         data = client_socket.recv(8192) 
-        decodedData = data.decode('UTF-8')
-        print('\n'+decodedData+'\n')
+        received_message = data.decode('UTF-8')
+        print(received_message)
         
-        
-    def parse_message(self, msg):
-        splitMsg = msg.split("\n")
-        return splitMsg
-      
     def lookup_RFC(self, client_socket):
-        sendMessage = self.create_message('LOOKUP',0)
-        client_socket.send(bytes(sendMessage,'UTF-8'))    
+        message_to_send = self.create_message('LOOKUP',0)
+        client_socket.send(bytes(message_to_send,'UTF-8'))    
         data = client_socket.recv(8192) 
-        decodedData = data.decode('UTF-8')
-        peerList = self.parse_message(decodedData)
-        print('\n'+peerList[0])
-        
-        if '200 OK' in peerList[0]:            
-            for i in range(1,len(peerList)-1):
-                peerDetails = peerList[i].split('<sp>')
-                print("%d. Host:%s\tPort:%s"%(i,peerDetails[2],peerDetails[3]))
-            print(str(i+1)+". Quit Download Option")
-            option = input("option = ")
-            while int(option) > len(peerList)+1 or int(option) == 0:
+        received_message = data.decode('UTF-8')
+        peer_list = received_message.split("\n")        
+        if '200 OK' in peer_list[0]:            
+            for i in range(1, len(peer_list)-1):
+                peerDetails = peer_list[i].split('<sp>')
+                print("%d. Host:%s\tPort:%s"%(i, peerDetails[2], peerDetails[3]))
+            print(str(i+1)+". Dont Download")
+            option = input("Option = ")
+            while int(option) > len(peer_list)+1 or int(option) == 0:
                     option = input("Enter Proper option = ") 
             if int(option) == i+1:
                     return
             else:
-                self.downloadRFC(peerList[int(option)])        
+                self.download_RFC(peer_list[int(option)])        
                 return
                     
-    def downloadRFC(self, pList):
-        selectedHost = pList.split('<sp>')
+    def download_RFC(self, peer_list):
+        selectedHost = peer_list.split('<sp>')
         #extracting the RFC Number, Host IP address, Host Port
         rfc = selectedHost[0]
         host = selectedHost[2]
@@ -116,17 +105,17 @@ class open_connection(threading.Thread):
         downloadSocket.connect((host,port))
         
         #sending a GET Request to the Peer for the required RFC
-        sendMessage = self.create_message('GET', rfc)
-        downloadSocket.send(bytes(sendMessage,'UTF-8'))    
+        message_to_send = self.create_message('GET', rfc)
+        downloadSocket.send(bytes(message_to_send,'UTF-8'))    
         
         #Receiving the status message + DATA from the peer
         data = downloadSocket.recv(8192) 
-        decodedData = data.decode('UTF-8')
-        print('Download Response:\n'+decodedData+'\nMessage End')
+        received_message = data.decode('UTF-8')
+        print('Download Response:\n'+received_message+'\nMessage End')
         
         #If the status is OK then a file is created and /
         #contents are downloaded and the download socket is closed.
-        if '200 OK' in decodedData:
+        if '200 OK' in received_message:
             filename = 'RFC'+rfc+'.txt'
             f = open(filename,'w')        
             data = ''
@@ -148,11 +137,11 @@ class open_connection(threading.Thread):
     
     #sends LIST ALL Message to the server to receive the entire LIST
     def list_all(self, client_socket):
-        sendMessage = self.create_message('LIST',None)
-        client_socket.send(bytes(sendMessage,'UTF-8'))    
+        message_to_send = self.create_message('LIST',None)
+        client_socket.send(bytes(message_to_send,'UTF-8'))    
         data = client_socket.recv(8192) 
-        decodedData = data.decode('UTF-8')
-        self.printList(decodedData)
+        received_message = data.decode('UTF-8')
+        self.printList(received_message)
 
         
 upload_port = int(input("Upload Port Number = ") ) 
