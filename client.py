@@ -135,13 +135,12 @@ class open_connection(threading.Thread):
         
         #sending a GET Request to the Peer for the required RFC
         sendMessage = self.formMessage('GET', rfc)
-        print(sendMessage)
         downloadSocket.send(bytes(sendMessage,'UTF-8'))    
         
         #Receiving the status message + DATA from the peer
         data = downloadSocket.recv(8192) 
         decodedData = data.decode('UTF-8')
-        print('Message start\n'+decodedData+'message end\n')
+        print('Download Response:\n'+decodedData+'\nMessage End')
         
         #If the status is OK then a file is created and /
         #contents are downloaded and the download socket is closed.
