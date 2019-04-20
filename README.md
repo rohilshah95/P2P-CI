@@ -5,9 +5,8 @@
 * Sharvari Deshpande (shdeshpa, 200206230)
 
 ### Instructions: 
-* This required Python 3.x to work 
-* run `make` if running on VCL to open ports, else it wont work. 
+* This requires Python 3.x to work 
+* Make sure all ports are open (EC2 security group `Allow ALL Traffic`)
 * start server using `python3 server.py`
 * start each client using `python3 client.py`
-* We have opened up ports 3000, 4000, 5000, 6000, 7000, 8000 on VCL, so use clients on these ports only for uploading. 
-* Client should have file name as "RFC123.txt" the rfc number should be the name of the file.
+* Client should have file name as `RFCxxx.txt` . The RFC number should be the name of the file.
