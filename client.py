@@ -39,10 +39,10 @@ class open_connection(threading.Thread):
             elif option == '4':
                 client_socket.close()
                 break
-                exit()
             else:
                 print("Invalid Option Selected")
-        exit()
+        raise SystemExit(0)
+
 
     def create_message(self, type, rfc_number):
         version = 'P2P-CI/1.0'
