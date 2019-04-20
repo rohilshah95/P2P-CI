@@ -60,7 +60,7 @@ class open_connection(threading.Thread):
             sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
         elif type == 'LOOKUP':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
-            # title = 'Title:'+sp+str(input("RFC title = "))
+            title = 'Title:'+sp+str(input("RFC title = "))
             sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
         elif type == 'GET':
             RFC = 'RFC'+sp+rfc_number
