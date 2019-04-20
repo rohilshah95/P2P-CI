@@ -43,6 +43,7 @@ class open_connection(threading.Thread):
             elif option == '4':
                 client_socket.close()
                 self.flag = 1
+                sys.exit()
             else:
                 print("Invalid Selection. Re-enter the Option!!!")
 
