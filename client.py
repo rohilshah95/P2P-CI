@@ -141,7 +141,7 @@ class open_connection(threading.Thread):
         #Receiving the status message + DATA from the peer
         data = downloadSocket.recv(8192) 
         decodedData = data.decode('UTF-8')
-        print('\n'+decodedData+'\n')
+        print('Message start\n'+decodedData+'message end\n')
         
         #If the status is OK then a file is created and /
         #contents are downloaded and the download socket is closed.
