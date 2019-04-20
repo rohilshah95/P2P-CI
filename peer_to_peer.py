@@ -18,7 +18,6 @@ class uploader(threading.Thread):
             m2.append(str(l).split(" "))        
         return m2
         
-    #Response to other Clients requesting download
     def respondToRequest(self,message):    
         method = message[0][0]
         version = message[0][3]

@@ -6,7 +6,6 @@ import sys
 import threading
 from peer_to_peer import upload_process, uploader
 
-#Thread to interact with Server
 class open_connection(threading.Thread):
     def __init__(self, port):
         threading.Thread.__init__(self)
@@ -14,7 +13,6 @@ class open_connection(threading.Thread):
         self.start()
         
     def run(self):
-        #Opens a permanent connection with the server
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = input('Server IP Address = ')
         port = 7734
@@ -95,57 +93,46 @@ class open_connection(threading.Thread):
                     
     def download_RFC(self, peer_list):
         selectedHost = peer_list.split('<sp>')
-        #extracting the RFC Number, Host IP address, Host Port
         rfc = selectedHost[0]
         host = selectedHost[2]
         port = int(selectedHost[4])
         
-        #opengin a socket to download from the selected peer
-        downloadSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        downloadSocket.connect((host,port))
+        peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        peer_socket.connect((host,port))
         
-        #sending a GET Request to the Peer for the required RFC
         message_to_send = self.create_message('GET', rfc)
-        downloadSocket.send(bytes(message_to_send,'UTF-8'))    
+        peer_socket.send(bytes(message_to_send,'UTF-8'))    
         
-        #Receiving the status message + DATA from the peer
-        data = downloadSocket.recv(8192) 
+        data = peer_socket.recv(8192) 
         received_message = data.decode('UTF-8')
         print('Download Response:\n'+received_message+'\nMessage End')
         
-        #If the status is OK then a file is created and /
-        #contents are downloaded and the download socket is closed.
         if '200 OK' in received_message:
             filename = 'RFC'+rfc+'.txt'
             f = open(filename,'w')        
             data = ''
             while data != bytes('','UTF-8'):
-                data = downloadSocket.recv(8192) 
+                data = peer_socket.recv(8192) 
                 f.write(data.decode('UTF-8'))
             f.close()
             print("Download Successful")
-        downloadSocket.close()
+        peer_socket.close()
     
-    #Prints the Index received from the server.
-    def printList(self,rfcList):
-        masterList = rfcList.split('\n')
-        print('\n'+masterList[0]+'\n')
-        if '200 OK' in masterList[0]:
-            for i in range(1,len(masterList)-1):
-                    r = masterList[i].split('<sp>')
-                    print(str(i)+'.\t'+r[0]+'\t'+r[1]+'\t'+r[2]+'\t'+r[3]+'\n')   
-    
-    #sends LIST ALL Message to the server to receive the entire LIST
     def list_all(self, client_socket):
         message_to_send = self.create_message('LIST',None)
         client_socket.send(bytes(message_to_send,'UTF-8'))    
         data = client_socket.recv(8192) 
         received_message = data.decode('UTF-8')
-        self.printList(received_message)
+        masterList = received_message.split('\n')
+        print('\n'+masterList[0]+'\n')
+        if '200 OK' in masterList[0]:
+            for i in range(1,len(masterList)-1):
+                    r = masterList[i].split('<sp>')
+                    print(str(i)+'.\t'+r[0]+'\t'+r[1]+'\t'+r[2]+'\t'+r[3]+'\n')
 
         
 upload_port = int(input("Upload Port Number = ") ) 
-client_connection = open_connection(upload_port)                 #Thread to communicate with the server
+client_connection = open_connection(upload_port)            
 uploadToClient = upload_process(upload_port) 	
 while client_connection.isAlive():
 	pass

@@ -31,23 +31,21 @@ class clientHandler(threading.Thread):
     def parse_message(self, message):
         # Return message will be (Action, RFC_NO, HOST, PORT, Title, P2P Version)
         message = message.split("\n")
-        m2 = []
+        parsed_message = []
         for l in message:
-            m2.append(str(l).split(' '))
-        if len(m2[3])>1:
-            title = " ".join(m2[3][1:])
-        if 'LIST' in m2[0][0]:
-            return(m2[0][0], None, m2[1][1], m2[2][1], None, m2[0][1])
+            parsed_message.append(str(l).split(' '))
+        if len(parsed_message[3])>1:
+            title = " ".join(parsed_message[3][1:])
+        if 'LIST' in parsed_message[0][0]:
+            return(parsed_message[0][0], None, parsed_message[1][1], parsed_message[2][1], None, parsed_message[0][1])
         else:
-            return(m2[0][0], m2[0][2], m2[1][1], m2[2][1], title, m2[0][3])
+            return(parsed_message[0][0], parsed_message[0][2], parsed_message[1][1], parsed_message[2][1], title, parsed_message[0][3])
 
-    #Response to the Clients for all type of REQUESTS        
     def send_message(self, status, append_message):
         pre_message = 'P2P-CI/1.0 '+status+'\n'+append_message
         self.client_socket.send(bytes(pre_message,'UTF-8'))
         return
     
-    #Adding RFC to Server
     def add_rfc(self,message, address):
         rfc_lock.acquire()
         rfc_list.append((message[1], message[4] , address[0] , message[3], address[1]))
@@ -56,7 +54,6 @@ class clientHandler(threading.Thread):
         self.send_message('200 OK', ack)
         return
     
-    #Look Up Service
     def lookup(self, message):
         result = ''
         rfc_number = message[1]
@@ -70,7 +67,6 @@ class clientHandler(threading.Thread):
             self.send_message('200 OK', result)
         return
     
-    #Listing all the Active Peers
     def list_all(self, message):
         list_of_rfc = ''
         sp = '<sp>'
@@ -79,7 +75,6 @@ class clientHandler(threading.Thread):
         self.send_message('200 OK', list_of_rfc)
         
     def run(self):
-        # acquire lock to maintain consistency 
         peer_lock.acquire()
         active_peers.append(self.client_address)
         peer_lock.release()
@@ -112,13 +107,12 @@ class clientHandler(threading.Thread):
         self.client_socket.close()
         
         
-#Creating Sockets to List on port 7734
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
 host = socket.gethostname()
 port = 7734    
 soc.bind((host,port))
 print("Server connected on : %s:%s \nWaiting for clients" %(host,port))
-soc.listen(5) # Max 5 connections
+soc.listen(5)
 try: 
     while True:
         c = clientHandler(soc.accept())
