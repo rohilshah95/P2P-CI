@@ -60,7 +60,7 @@ class clientHandler(threading.Thread):
     def lookup(self, message):
         result = ''
         rfc_number = message[1]
-        sp = '<c>'
+        sp = '<sp>'
         for rfc in rfc_list:
             if(rfc[0] == rfc_number):
                 result += rfc[0] + sp + rfc[1] + sp + str(rfc[2]) + sp + str(rfc[4]) + sp + rfc[3] + '\n'        
@@ -73,7 +73,7 @@ class clientHandler(threading.Thread):
     #Listing all the Active Peers
     def list_all(self, message):
         list_of_rfc = ''
-        sp = '<c>'
+        sp = '<sp>'
         for rfc in rfc_list:
             list_of_rfc += rfc[0] + sp + rfc[1] + sp + str(rfc[2]) + sp + str(rfc[4]) + sp + rfc[3] + '\n'
         self.send_message('200 OK', list_of_rfc)

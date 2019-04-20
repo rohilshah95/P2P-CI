@@ -53,22 +53,22 @@ class open_connection(threading.Thread):
         host = 'Host:'+sp+socket.gethostbyname(socket.gethostname())
         port = 'Port:'+sp+str(self.upload_port)    
         method = type
-        sendMsg = ''
+        message = ''
         if type == 'ADD':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
             title = 'Title:'+sp+str(input("RFC title = "))    
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
+            message = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
         elif type == 'LOOKUP':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
             title = 'Title:'+sp+str(input("RFC title = "))
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
+            message = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
         elif type == 'GET':
             RFC = 'RFC'+sp+rfc_number
             OS = 'OS:'+sp+platform.platform()
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                                
+            message = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                                
         else:
-            sendMsg = method+sp+version+crlf+host+crlf+port+crlf+crlf        
-        return sendMsg                
+            message = method+sp+version+crlf+host+crlf+port+crlf+crlf        
+        return message                
     
     def add_RFC(self, client_socket):
         sendMessage = self.create_message('ADD',0)
@@ -92,7 +92,7 @@ class open_connection(threading.Thread):
         
         if '200 OK' in peerList[0]:            
             for i in range(1,len(peerList)-1):
-                peerDetails = peerList[i].split('<c>')
+                peerDetails = peerList[i].split('<sp>')
                 print("%d. Host:%s\tPort:%s"%(i,peerDetails[2],peerDetails[3]))
             print(str(i+1)+". Quit Download Option")
             option = input("option = ")
@@ -105,7 +105,7 @@ class open_connection(threading.Thread):
                 return
                     
     def downloadRFC(self, pList):
-        selectedHost = pList.split('<c>')
+        selectedHost = pList.split('<sp>')
         #extracting the RFC Number, Host IP address, Host Port
         rfc = selectedHost[0]
         host = selectedHost[2]
@@ -133,7 +133,8 @@ class open_connection(threading.Thread):
             while data != bytes('','UTF-8'):
                 data = downloadSocket.recv(8192) 
                 f.write(data.decode('UTF-8'))
-            f.close()            
+            f.close()
+            print("Download Successful")
         downloadSocket.close()
     
     #Prints the Index received from the server.
@@ -142,7 +143,7 @@ class open_connection(threading.Thread):
         print('\n'+masterList[0]+'\n')
         if '200 OK' in masterList[0]:
             for i in range(1,len(masterList)-1):
-                    r = masterList[i].split('<c>')
+                    r = masterList[i].split('<sp>')
                     print(str(i)+'.\t'+r[0]+'\t'+r[1]+'\t'+r[2]+'\t'+r[3]+'\n')   
     
     #sends LIST ALL Message to the server to receive the entire LIST

@@ -54,7 +54,6 @@ class uploader(threading.Thread):
             for line in f:
                 self.client.send(bytes(line,'UTF-8'))
             f.close()
-            print("Download Successful")
         self.client.close()        
                      
     def run(self):
