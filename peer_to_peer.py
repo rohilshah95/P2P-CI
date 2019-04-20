@@ -48,14 +48,13 @@ class uploader(threading.Thread):
         content_type = 'Content-Type: text/plain' + crlf
         response_message = 'P2P-CI/1.0' + sp + status + crlf + current_time + OS + last_modified_time + content_length + content_type
         
-		# response_message = self.buildResponse(status, file)
-
         self.client.send(bytes(response_message,'UTF-8'))
         if status == '200 OK':
             f = open(file,'r')
             for line in f:
                 self.client.send(bytes(line,'UTF-8'))
             f.close()
+            print("Download Successful")
         self.client.close()        
                      
     def run(self):

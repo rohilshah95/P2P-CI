@@ -10,83 +10,75 @@ from peer_to_peer import upload_process, uploader
 class open_connection(threading.Thread):
     def __init__(self, port):
         threading.Thread.__init__(self)
-        self.uploadPort = port
+        self.upload_port = port
         self.start()
         
     def run(self):
         #Opens a permanent connection with the server
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        host = input('Host IP Address = ')
+        host = input('Server IP Address = ')
         port = 7734
         client_socket.connect((host,port))
-        self.requestServer(client_socket)    
+        self.send_request_to_server(client_socket)     
     
     def menu(self):
-        print("1. Add RFC to Server ")
-        print("2. Look Up an RFC ")
-        print("3. Request Whole Index List")
+        print("1. Add RFC to Server")
+        print("2. Look Up RFC")
+        print("3. Request Whole RFC Index")
         print("4. Leave the Network")
-        option = str(input("Option= "))
+        option = str(input("Please Enter Choice = "))
         return option
 
-    #Options for Client interface
-    def requestServer(self, client_socket):    
-        self.flag = 0    
-        while self.flag == 0:
+    def send_request_to_server(self, client_socket):       
+        while True:
             option = self.menu()
             if option == '1':
-                self.sendRFCAddRequest(client_socket)
+                self.add_RFC(client_socket)
             elif option == '2':
-                self.lookUpRequest(client_socket)
+                self.lookup_RFC(client_socket)
             elif option == '3':
-                self.wholeIndexRequest(client_socket)
+                self.list_all(client_socket)
             elif option == '4':
                 client_socket.close()
-                self.flag = 1
+                break
                 exit()
             else:
-                print("Invalid Selection. Re-enter the Option!!!")
+                print("Invalid Option Selected")
+        exit()
 
-    #Forms all the messages to be sent to the server.
-    #Uses the method ADD, LOOKUP and LIST as criteria to generate message
-    def formMessage(self, type, rfcNo):
+    def create_message(self, type, rfc_number):
         version = 'P2P-CI/1.0'
         sp = ' '
         crlf = '\n'
         host = 'Host:'+sp+socket.gethostbyname(socket.gethostname())
-        port = 'Port:'+sp+str(self.uploadPort)    
+        port = 'Port:'+sp+str(self.upload_port)    
         method = type
         sendMsg = ''
         if type == 'ADD':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
             title = 'Title:'+sp+str(input("RFC title = "))    
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            #PROPER REQUEST
-            
-            #sendMsg = method+sp+RFC+sp+'P2P-CI/2.0'+crlf+host+crlf+port+crlf+title+crlf+crlf    #Test for VERSION NOT SUPPORTED
-            #sendMsg = 'REMOVE'+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf        #Test for BAD REQUEST            
+            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
+    
         elif type == 'LOOKUP':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
-            title = 'Title:'+sp+str(input("RFC title = "))
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
+            # title = 'Title:'+sp+str(input("RFC title = "))
+            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf
         elif type == 'GET':
-            RFC = 'RFC'+sp+rfcNo
+            RFC = 'RFC'+sp+rfc_number
             OS = 'OS:'+sp+platform.platform()
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                        #PROPER REQUEST
+            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                        
             
-            #sendMsg = method+sp+RFC+sp+'P2P-CI/2.0'+crlf+host+crlf+OS+crlf+crlf                #Test for VERSION NOT SUPPORTED
-            #sendMsg = 'PUT'+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                        #Test for BAD REQUEST
-        elif type == 'CURR_ADD':
-            method = 'ADD'
-            RFC = 'RFC'+sp+rfcNo
-            title = 'Title:'+sp+'RFC'+sp+rfcNo
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
+        # elif type == 'CURR_ADD':
+        #     method = 'ADD'
+        #     RFC = 'RFC'+sp+rfc_number
+        #     title = 'Title:'+sp+'RFC'+sp+rfc_number
+        #     sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
         else:
             sendMsg = method+sp+version+crlf+host+crlf+port+crlf+crlf        
         return sendMsg                
     
-    #RFC Add Request
-    def sendRFCAddRequest(self, client_socket):
-        sendMessage = self.formMessage('ADD',0)
+    def add_RFC(self, client_socket):
+        sendMessage = self.create_message('ADD',0)
         client_socket.send(bytes(sendMessage,'UTF-8'))    
         data = client_socket.recv(8192) 
         decodedData = data.decode('UTF-8')
@@ -97,18 +89,14 @@ class open_connection(threading.Thread):
         splitMsg = msg.split("\n")
         return splitMsg
       
-    #Lookup Request to the Server
-    def lookUpRequest(self, client_socket):
-        #sends a lookup request
-        sendMessage = self.formMessage('LOOKUP',0)
+    def lookup_RFC(self, client_socket):
+        sendMessage = self.create_message('LOOKUP',0)
         client_socket.send(bytes(sendMessage,'UTF-8'))    
         data = client_socket.recv(8192) 
         decodedData = data.decode('UTF-8')
         peerList = self.parse_message(decodedData)
         print('\n'+peerList[0])
         
-        #if the requested RFC is available in the P2P network then 
-        #all the hosts containing the RFC are listed.
         if '200 OK' in peerList[0]:            
             for i in range(1,len(peerList)-1):
                 peerDetails = peerList[i].split('<c>')
@@ -135,7 +123,7 @@ class open_connection(threading.Thread):
         downloadSocket.connect((host,port))
         
         #sending a GET Request to the Peer for the required RFC
-        sendMessage = self.formMessage('GET', rfc)
+        sendMessage = self.create_message('GET', rfc)
         downloadSocket.send(bytes(sendMessage,'UTF-8'))    
         
         #Receiving the status message + DATA from the peer
@@ -165,8 +153,8 @@ class open_connection(threading.Thread):
                     print(str(i)+'.\t'+r[0]+'\t'+r[1]+'\t'+r[2]+'\t'+r[3]+'\n')   
     
     #sends LIST ALL Message to the server to receive the entire LIST
-    def wholeIndexRequest(self, client_socket):
-        sendMessage = self.formMessage('LIST',None)
+    def list_all(self, client_socket):
+        sendMessage = self.create_message('LIST',None)
         client_socket.send(bytes(sendMessage,'UTF-8'))    
         data = client_socket.recv(8192) 
         decodedData = data.decode('UTF-8')
