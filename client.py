@@ -58,21 +58,14 @@ class open_connection(threading.Thread):
             RFC = 'RFC'+sp+str(input("RFC Number = "))
             title = 'Title:'+sp+str(input("RFC title = "))    
             sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
-    
         elif type == 'LOOKUP':            
             RFC = 'RFC'+sp+str(input("RFC Number = "))
-            title = 'Title:'+sp+str(input("RFC title = "))
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf
+            # title = 'Title:'+sp+str(input("RFC title = "))
+            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
         elif type == 'GET':
             RFC = 'RFC'+sp+rfc_number
             OS = 'OS:'+sp+platform.platform()
-            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                        
-            
-        # elif type == 'CURR_ADD':
-        #     method = 'ADD'
-        #     RFC = 'RFC'+sp+rfc_number
-        #     title = 'Title:'+sp+'RFC'+sp+rfc_number
-        #     sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
+            sendMsg = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                                
         else:
             sendMsg = method+sp+version+crlf+host+crlf+port+crlf+crlf        
         return sendMsg                
