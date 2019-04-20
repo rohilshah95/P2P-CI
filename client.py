@@ -50,22 +50,22 @@ class open_connection(threading.Thread):
         version = 'P2P-CI/1.0'
         sp = ' '
         crlf = '\n'
-        host = 'Host:'+sp+socket.gethostbyname(socket.gethostname())
-        port = 'Port:'+sp+str(self.upload_port)    
+        host = 'Host:' + sp + socket.gethostbyname(socket.gethostname())
+        port = 'Port:' + sp + str(self.upload_port)    
         method = type
         message = ''
-        if type == 'ADD':            
-            RFC = 'RFC'+sp+str(input("RFC Number = "))
-            title = 'Title:'+sp+str(input("RFC title = "))    
-            message = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf            
-        elif type == 'LOOKUP':            
-            RFC = 'RFC'+sp+str(input("RFC Number = "))
-            title = 'Title:'+sp+str(input("RFC title = "))
-            message = method+sp+RFC+sp+version+crlf+host+crlf+port+crlf+title+crlf+crlf
+        if type == 'ADD' or type == 'LOOKUP':            
+            RFC = 'RFC'+ sp +str(input("RFC Number = "))
+            title = 'Title:' + sp + str(input("RFC title = "))    
+            message = method + sp + RFC + sp + version + crlf + host + crlf + port + crlf + title + crlf + crlf            
+        # elif type == 'LOOKUP':            
+        #     RFC = 'RFC'+ sp +str(input("RFC Number = "))
+        #     title = 'Title:' + sp + str(input("RFC title = "))    
+        #     message = method + sp + RFC + sp + version + crlf + host + crlf + port + crlf + title + crlf + crlf
         elif type == 'GET':
-            RFC = 'RFC'+sp+rfc_number
-            OS = 'OS:'+sp+platform.platform()
-            message = method+sp+RFC+sp+version+crlf+host+crlf+OS+crlf+crlf                                
+            RFC = 'RFC' + sp + rfc_number
+            OS = 'OS:'+ sp + platform.platform()
+            message = method + sp + RFC + sp + version + crlf + host + crlf + OS + crlf + crlf                                
         else:
             message = method+sp+version+crlf+host+crlf+port+crlf+crlf        
         return message                
