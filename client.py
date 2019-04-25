@@ -18,7 +18,6 @@ class open_connection(threading.Thread):
         port = 7734
         client_socket.connect((host,port))
         self.send_request_to_server(client_socket)   
-        print("came here")  
     
     def menu(self):
         print("1. Add RFC to Server")
@@ -29,20 +28,23 @@ class open_connection(threading.Thread):
         return option
 
     def send_request_to_server(self, client_socket):       
-        while True:
-            option = self.menu()
-            if option == '1':
-                self.add_RFC(client_socket)
-            elif option == '2':
-                self.lookup_RFC(client_socket)
-            elif option == '3':
-                self.list_all(client_socket)
-            elif option == '4':
-                client_socket.close()
-                print("Press CRTL + c to exit")
-                break
-            else:
-                print("Invalid Option Selected")
+        try:
+            while True:
+                option = self.menu()
+                if option == '1':
+                    self.add_RFC(client_socket)
+                elif option == '2':
+                    self.lookup_RFC(client_socket)
+                elif option == '3':
+                    self.list_all(client_socket)
+                elif option == '4':
+                    client_socket.close()
+                    print("Press CRTL + c to exit")
+                    break
+                else:
+                    print("Invalid Option Selected")
+        except KeyboardInterrupt:
+            print("Client Closed")
         raise SystemExit(0)
 
 
