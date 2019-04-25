@@ -22,13 +22,12 @@ class uploader(threading.Thread):
         method = message[0][0]
         version = message[0][3]
         file = 'RFC'+message[0][2]+'.txt'                
-        status = ''
         if method != 'GET':                               
-            status = '400 Bad Request'            
+            status = '400 Bad Request'    
+        elif not os.path.exists(file):    
+            status = '404 Not Found'        
         elif version != 'P2P-CI/1.0':                    
             status = '505 P2P-CI Version Not Supported' 
-        elif not os.path.exists(file):    
-            status = '404 Not Found'
         else:
             status = '200 OK' 
         
@@ -40,9 +39,11 @@ class uploader(threading.Thread):
             last_modified_time = 'Last-Modified:' + crlf
             content_length = 'Content-Length:' + crlf
         else:
+            length = str(os.path.getsize(file))
             seconds = os.path.getmtime(file)
-            last_modified_time = 'Last-Modified:' + sp + time.strftime('%Y-%m-%d %H:%M', time.localtime(seconds)) + crlf
-            content_length = 'Content-Length:'+ str(os.path.getsize(file)) + crlf
+            modified_time = time.strftime('%Y-%m-%d %H:%M', time.localtime(seconds))
+            last_modified_time = 'Last-Modified:' + sp + modified_time + crlf
+            content_length = 'Content-Length:'+ length + crlf
             
         content_type = 'Content-Type: text/plain' + crlf
         response_message = 'P2P-CI/1.0' + sp + status + crlf + current_time + OS + last_modified_time + content_length + content_type
