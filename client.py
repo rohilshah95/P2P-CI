@@ -17,7 +17,8 @@ class open_connection(threading.Thread):
         host = input('Enter Server IP Address = ')
         port = 7734
         client_socket.connect((host,port))
-        self.send_request_to_server(client_socket)     
+        self.send_request_to_server(client_socket)   
+        print("came here")  
     
     def menu(self):
         print("1. Add RFC to Server")
