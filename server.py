@@ -14,6 +14,7 @@ class clientHandler(threading.Thread):
         self.status = ''
         self.client_socket = entry[0]
         self.client_address = entry[1]
+        self.start()
     
     def remove_client(self,address):
         print('Client %s has closed the connection' %(address[0]))
