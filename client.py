@@ -137,6 +137,8 @@ try:
     upload_port = int(input("Upload Port Number = ") ) 
     client_connection = open_connection(upload_port)            
     uploadToClient = upload_process(upload_port) 	
+    client_connection.join()
+    uploadToClient.join()
     while client_connection.isAlive():
         pass
     uploadToClient.peer_socket.close()

@@ -116,6 +116,6 @@ soc.listen(5)
 try: 
     while True:
         c = clientHandler(soc.accept())
-        c.start()
+        c.join()
 except KeyboardInterrupt:
     print("Server offline")

@@ -76,7 +76,7 @@ class upload_process(threading.Thread):
         while True:
             try:
                 u = uploader(self.peer_socket.accept())
-                u.start()
+                u.join()
             except:
                 print('Client closed its connection')
                 break
