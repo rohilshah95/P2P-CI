@@ -38,6 +38,7 @@ class open_connection(threading.Thread):
                 self.list_all(client_socket)
             elif option == '4':
                 client_socket.close()
+                print("Press CRTL + c to exit")
                 break
             else:
                 print("Invalid Option Selected")
@@ -129,12 +130,14 @@ class open_connection(threading.Thread):
                     r = list_rfc[i].split('<sp>')
                     print(str(i)+'.\t'+r[0]+'\t'+r[1]+'\t'+r[2]+'\t'+r[3]+'\n')
 
-        
-upload_port = int(input("Upload Port Number = ") ) 
-client_connection = open_connection(upload_port)            
-uploadToClient = upload_process(upload_port) 	
-while client_connection.isAlive():
-	pass
-uploadToClient.peer_socket.close()
+try:
+    upload_port = int(input("Upload Port Number = ") ) 
+    client_connection = open_connection(upload_port)            
+    uploadToClient = upload_process(upload_port) 	
+    while client_connection.isAlive():
+        pass
+    uploadToClient.peer_socket.close()
+except KeyboardInterrupt:
+    print("Client Closed")
 
     
