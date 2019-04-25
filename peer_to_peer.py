@@ -12,11 +12,11 @@ class uploader(threading.Thread):
         self.address = entry[1]
        
     def parse_message(self, message):
-        m1 = message.split("\n")
-        m2 = []
-        for l in m1:
-            m2.append(str(l).split(" "))        
-        return m2
+        message = message.split("\n")
+        parsed_message = []
+        for l in message:
+            parsed_message.append(str(l).split(" "))        
+        return parsed_message
         
     def respondToRequest(self,message):    
         method = message[0][0]
