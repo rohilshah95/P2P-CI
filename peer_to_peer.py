@@ -10,13 +10,6 @@ class uploader(threading.Thread):
         threading.Thread.__init__(self)
         self.client = entry[0]
         self.address = entry[1]
-       
-    def parse_message(self, message):
-        message = message.split("\n")
-        parsed_message = []
-        for l in message:
-            parsed_message.append(str(l).split(" "))        
-        return parsed_message
         
     def respondToRequest(self,message):    
         method = message[0][0]
@@ -61,8 +54,11 @@ class uploader(threading.Thread):
         message = self.client.recv(8192)
         message = message.decode('UTF-8')
         print(message)
-        message = self.parse_message(message)
-        self.respondToRequest(message)
+        message = message.split("\n")
+        parsed_message = []
+        for l in message:
+            parsed_message.append(str(l).split(" "))   
+        self.respondToRequest(parsed_message)
         
         
 class upload_process(threading.Thread):        
