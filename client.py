@@ -71,14 +71,14 @@ class open_connection(threading.Thread):
     def add_RFC(self, client_socket):
         message_to_send = self.create_message('ADD',0)
         client_socket.send(bytes(message_to_send,'UTF-8'))    
-        data = client_socket.recv(8192) 
+        data = client_socket.recv(2048) 
         received_message = data.decode('UTF-8')
         print(received_message)
         
     def lookup_RFC(self, client_socket):
         message_to_send = self.create_message('LOOKUP',0)
         client_socket.send(bytes(message_to_send,'UTF-8'))    
-        data = client_socket.recv(8192) 
+        data = client_socket.recv(2048) 
         received_message = data.decode('UTF-8')
         peer_list = received_message.split("\n")        
         if '200 OK' in peer_list[0]:            
@@ -106,7 +106,7 @@ class open_connection(threading.Thread):
         message_to_send = self.create_message('GET', rfc)
         peer_socket.send(bytes(message_to_send,'UTF-8'))    
         
-        data = peer_socket.recv(8192) 
+        data = peer_socket.recv(2048) 
         received_message = data.decode('UTF-8')
         print('Download Response:\n'+received_message+'\nMessage End')
         
@@ -115,7 +115,7 @@ class open_connection(threading.Thread):
             f = open(filename,'w')        
             data = ''
             while data != bytes('','UTF-8'):
-                data = peer_socket.recv(8192) 
+                data = peer_socket.recv(2048) 
                 f.write(data.decode('UTF-8'))
             f.close()
             print("Download Successful")
@@ -124,7 +124,7 @@ class open_connection(threading.Thread):
     def list_all(self, client_socket):
         message_to_send = self.create_message('LIST',None)
         client_socket.send(bytes(message_to_send,'UTF-8'))    
-        data = client_socket.recv(8192) 
+        data = client_socket.recv(2048) 
         received_message = data.decode('UTF-8')
         list_rfc = received_message.split('\n')
         print('\n'+list_rfc[0]+'\n')

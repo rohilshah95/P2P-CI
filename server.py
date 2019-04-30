@@ -81,7 +81,7 @@ class clientHandler(threading.Thread):
         print("Client %s has joined the network" %(self.client_address[0]))
         while True:
             try:
-                response = self.client_socket.recv(8192)
+                response = self.client_socket.recv(2048)
             except:
                 break
             message = response.decode('UTF-8')

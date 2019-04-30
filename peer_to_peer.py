@@ -51,7 +51,7 @@ class uploader(threading.Thread):
                      
     def run(self):
         print("Client %s has connected for download" %(self.address[0]))
-        message = self.client.recv(8192)
+        message = self.client.recv(2048)
         message = message.decode('UTF-8')
         print(message)
         message = message.split("\n")
